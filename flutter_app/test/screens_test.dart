@@ -111,12 +111,15 @@ void main() {
         tester
             .widget<ArabicKeyboard>(find.byType(ArabicKeyboard))
             .onLetter(word.answer[i]);
-        await tester.pumpAndSettle();
+        // The completed level shows a continuously animated character.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
       }
     }
     expect(store.solvedWords.length, puzzle.words.length);
     expect(store.balance, 180);
     expect(find.byType(VictoryDialog), findsOneWidget);
+    expect(find.text('شكراً يا أبي جوهر!'), findsOneWidget);
     expect(find.text('+60 قطعة ذهبية'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -240,6 +243,7 @@ void main() {
         reduced: true));
     await tester.pumpAndSettle();
     expect(find.text('صعب'), findsOneWidget);
+    expect(find.text('شكراً يا أبي جوهر!'), findsOneWidget);
     expect(find.text('+60 قطعة ذهبية'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

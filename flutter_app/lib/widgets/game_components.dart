@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/puzzle.dart';
+import '../services/speech_service.dart';
 import '../theme.dart';
+import 'jawhar_celebration.dart';
 
 class Entrance extends StatelessWidget {
   const Entrance({super.key, required this.child, this.order = 0});
@@ -219,7 +222,7 @@ Route<T> gameRoute<T>(Widget child) => PageRouteBuilder<T>(
               child: page));
     });
 
-class VictoryDialog extends StatelessWidget {
+class VictoryDialog extends StatefulWidget {
   const VictoryDialog(
       {super.key,
       required this.level,
@@ -230,6 +233,31 @@ class VictoryDialog extends StatelessWidget {
   final int reward;
   final VoidCallback onNext;
   final VoidCallback onHome;
+  @override
+  State<VictoryDialog> createState() => _VictoryDialogState();
+}
+
+class _VictoryDialogState extends State<VictoryDialog> {
+  static const _thanks = 'شكراً يا أبي جوهر!';
+  static const _dedication = 'هذا الإنجاز لك، بكل الحب والتقدير.';
+  final _speech = SpeechService();
+  bool _speechUnavailable = false;
+
+  Future<void> _sayThanks() async {
+    final spoken = await _speech.speak('$_thanks $_dedication');
+    if (!mounted) {
+      await _speech.stop();
+      return;
+    }
+    setState(() => _speechUnavailable = !spoken);
+  }
+
+  @override
+  void dispose() {
+    unawaited(_speech.stop());
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => Dialog(
       insetPadding: const EdgeInsets.all(24),
@@ -242,24 +270,44 @@ class VictoryDialog extends StatelessWidget {
                     padding: const EdgeInsets.all(26),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       const SizedBox(height: 10),
-                      Entrance(
-                          child: Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFFF0E6D2)),
-                              child: const Icon(Icons.emoji_events_rounded,
-                                  size: 66, color: GameColors.gold))),
-                      const SizedBox(height: 20),
-                      const Text('خطوة جميلة في رحلتك!',
-                          style: TextStyle(
-                              fontSize: 27, fontWeight: FontWeight.w900)),
+                      const JawharCelebration(),
                       const SizedBox(height: 8),
-                      Text('أكملت المستوى ${arabicNumber(level)} بكل تألق',
+                      SoftPanel(
+                          color: GameColors.sand,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          child: const Column(children: [
+                            Text(_thanks,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: GameColors.primary,
+                                    fontSize: 23,
+                                    fontWeight: FontWeight.w900)),
+                            SizedBox(height: 4),
+                            Text(_dedication,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: GameColors.muted, fontSize: 13)),
+                          ])),
+                      TextButton.icon(
+                          onPressed: _sayThanks,
+                          icon: const Icon(Icons.volume_up_rounded, size: 20),
+                          label: const Text('اسمع رسالة الشكر')),
+                      if (_speechUnavailable)
+                        Semantics(
+                            liveRegion: true,
+                            child: const Text(
+                                'الصوت العربي غير متاح على هذا الجهاز.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: GameColors.muted, fontSize: 12))),
+                      const SizedBox(height: 8),
+                      Text(
+                          'أكملت المستوى ${arabicNumber(widget.level)} بكل تألق',
                           textAlign: TextAlign.center),
                       const SizedBox(height: 12),
                       DifficultyBadge(
-                          difficulty: GameDifficulty.forLevel(level)),
+                          difficulty: GameDifficulty.forLevel(widget.level)),
                       const SizedBox(height: 20),
                       SoftPanel(
                           color: const Color(0xFFF3EDE1),
@@ -271,8 +319,8 @@ class VictoryDialog extends StatelessWidget {
                                 const SizedBox(width: 10),
                                 Flexible(
                                     child: Text(
-                                        reward > 0
-                                            ? '+${arabicNumber(reward)} قطعة ذهبية'
+                                        widget.reward > 0
+                                            ? '+${arabicNumber(widget.reward)} قطعة ذهبية'
                                             : 'المكافأة محفوظة في رصيدك',
                                         style: const TextStyle(
                                             fontWeight: FontWeight.w800,
@@ -282,13 +330,13 @@ class VictoryDialog extends StatelessWidget {
                       SizedBox(
                           width: double.infinity,
                           child: FilledButton.icon(
-                              onPressed: onNext,
+                              onPressed: widget.onNext,
                               icon: const Icon(Icons.arrow_back_rounded,
                                   textDirection: TextDirection.ltr),
                               label: const Text('التحدي التالي'))),
                       const SizedBox(height: 6),
                       TextButton(
-                          onPressed: onHome,
+                          onPressed: widget.onHome,
                           child: const Text('العودة إلى رحلتي')),
                     ])))
           ])));

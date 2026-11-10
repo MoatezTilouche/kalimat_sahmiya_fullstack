@@ -126,7 +126,8 @@ void main() {
         Scaffold(
             body: Center(
                 child: VictoryDialog(
-                    level: 51, reward: 60, onNext: () {}, onHome: () {}))));
+                    level: 51, reward: 60, onNext: () {}, onHome: () {}))),
+        settle: false);
     await tester.pumpWidget(const SizedBox.shrink());
     await store.learning.setPreference('focus_mode', 'true');
     await capture('focus', GameScreen(level: 1, store: store));
