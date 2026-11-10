@@ -95,11 +95,37 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
               title: const Text('كلمات سهمية'),
-              content: const SingleChildScrollView(
-                  child: Text('إلى أبي الغالي جوهر، بكل الحب والتقدير\n\n'
-                      'ووردنت العربية 4.0 لصلاح عبده، المشتقة من ووردنت الإنجليزية المفتوحة وووردنت برنستون. ترخيص نسب المصنف 4.0.\n\n'
-                      'بيانات التواتر: مختبر كامل، بترخيص نسب المصنف والترخيص بالمثل 4.0. الخط: نوتو العربية.\n\n'
-                      'البطاقات تعرض التعريفات كما وردت في مصادرها. بعض التعريفات المستوردة لم تخضع لمراجعة تحريرية. لم تُولّد حقائق موسوعية أو إضافات آلية.')),
+              content: const SizedBox(
+                  width: 360,
+                  child: SingleChildScrollView(
+                      child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                        Text('إلى أبي الغالي جوهر، بكل الحب والتقدير',
+                            style: TextStyle(
+                                color: GameColors.primary,
+                                fontWeight: FontWeight.w700)),
+                        SizedBox(height: 6),
+                        Text('من ابنك معتز، الذي يحبك كثيرًا.'),
+                        SizedBox(height: 16),
+                        Text(
+                            'ألغاز عربية، ومعانٍ جديدة، ولحظات هادئة مع الكلمات.'),
+                        SizedBox(height: 16),
+                        ExpansionTile(
+                            tilePadding: EdgeInsets.zero,
+                            title: Text('المصادر والتراخيص',
+                                style: TextStyle(fontSize: 14)),
+                            children: [
+                              Text(
+                                  'معجم الكلمات: ووردنت العربية 4.0 لصلاح عبده، المشتقة من ووردنت الإنجليزية المفتوحة وووردنت برنستون. الترخيص: CC BY 4.0.\n\n'
+                                  'بيانات شيوع الكلمات: مختبر CAMeL. الترخيص: CC BY-SA 4.0.\n\n'
+                                  'الخط: Noto Sans Arabic. الترخيص: SIL OFL 1.1.',
+                                  style: TextStyle(
+                                      fontSize: 12, color: GameColors.muted)),
+                              SizedBox(height: 12)
+                            ])
+                      ]))),
               actions: [
                 TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -325,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 18),
             TextButton(
                 onPressed: _about,
-                child: const Text('صُنعت بحب لجوهر · المصادر والتراخيص')),
+                child: const Text('صُنعت بحب لجوهر · عن التطبيق')),
           ])),
     ]));
   }

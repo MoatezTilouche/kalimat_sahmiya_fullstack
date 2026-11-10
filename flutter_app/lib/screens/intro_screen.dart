@@ -181,7 +181,7 @@ class _IntroScreenState extends State<IntroScreen> {
                                                           FontWeight.w700)),
                                               const SizedBox(height: 4),
                                               Text(
-                                                  'لك هذه الرحلة، ومعك كل المعاني أجمل',
+                                                  'من ابنك معتز، الذي يحبك كثيرًا.',
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                       fontSize: 11,
