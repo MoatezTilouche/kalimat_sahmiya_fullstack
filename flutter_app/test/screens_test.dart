@@ -128,11 +128,14 @@ void main() {
     final store = MemoryStore(puzzle);
     await tester.pumpWidget(ArabicArrowwordsApp(store: store));
     await tester.pump(const Duration(seconds: 3));
-    await tester.pumpAndSettle();
+    // The welcome icon loops continuously, so wait only for page transitions.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
     expect(find.text('إلى أبي الغالي جوهر، بكل الحب والتقدير'), findsOneWidget);
     for (var i = 0; i < 3; i++) {
       await tester.tap(find.text('التالي'));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
     }
     expect(find.textContaining('استخدم التلميح'), findsOneWidget);
     await tester.tap(find.text('ابدأ رحلتك'));

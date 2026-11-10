@@ -10,8 +10,11 @@ class IntroScreen extends StatefulWidget {
   State<IntroScreen> createState() => _IntroScreenState();
 }
 
-class _IntroScreenState extends State<IntroScreen> {
+class _IntroScreenState extends State<IntroScreen>
+    with SingleTickerProviderStateMixin {
   final _pages = PageController();
+  late final _welcomeAnimation = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 1800));
   int _page = 0;
   bool _starting = false;
   bool _exampleSelected = false;
@@ -38,7 +41,19 @@ class _IntroScreenState extends State<IntroScreen> {
     ),
   ];
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (motionDuration(context) == Duration.zero) {
+      _welcomeAnimation.stop();
+      _welcomeAnimation.value = 0;
+    } else if (!_welcomeAnimation.isAnimating) {
+      _welcomeAnimation.repeat(reverse: true);
+    }
+  }
+
+  @override
   void dispose() {
+    _welcomeAnimation.dispose();
     _pages.dispose();
     super.dispose();
   }
@@ -159,7 +174,24 @@ class _IntroScreenState extends State<IntroScreen> {
                                                     fontWeight: FontWeight.w900,
                                                     color: Colors.white))),
                                         const SizedBox(height: 30),
-                                        const PuzzleEmblem(size: 174),
+                                        AnimatedBuilder(
+                                            animation: _welcomeAnimation,
+                                            child: const RepaintBoundary(
+                                                child: PuzzleEmblem(size: 174)),
+                                            builder: (context, child) {
+                                              final value = Curves.easeInOut
+                                                  .transform(
+                                                      _welcomeAnimation.value);
+                                              return Transform.translate(
+                                                  offset:
+                                                      Offset(0, -10 * value),
+                                                  child: Transform.rotate(
+                                                      angle: .04 * value,
+                                                      child: Transform.scale(
+                                                          scale:
+                                                              1 + .025 * value,
+                                                          child: child)));
+                                            }),
                                         const SizedBox(height: 32),
                                         SoftPanel(
                                             color: Colors.white

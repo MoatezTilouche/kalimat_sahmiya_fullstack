@@ -120,7 +120,7 @@ void main() {
     await tester.ensureVisible(find.text('متابعة اللعب'));
     await tester.tap(find.text('متابعة اللعب'));
     await tester.pumpAndSettle();
-    await capture('intro', IntroScreen(onStart: () async {}));
+    await capture('intro', IntroScreen(onStart: () async {}), settle: false);
     await capture(
         'victory',
         Scaffold(
