@@ -19,18 +19,20 @@ class ApiService {
       : _client = client ?? http.Client(),
         _baseUrl = baseUrl ?? defaultBaseUrl;
   static const defaultBaseUrl = String.fromEnvironment('API_BASE_URL',
-      defaultValue: 'http://10.0.2.2:8000');
+      defaultValue: 'https://kalimat-sahmiya-api.onrender.com');
   final http.Client _client;
   final String _baseUrl;
   final Duration timeout;
   final Map<String, Future<Map<String, dynamic>>> _pending = {};
 
-  Future<Map<String, dynamic>> _get(String path, Map<String, String> query) {
+  Future<Map<String, dynamic>> _get(String path, Map<String, String> query,
+      {Duration? requestTimeout}) {
     final uri = Uri.parse('$_baseUrl$path').replace(queryParameters: query);
     final key = uri.toString();
     return _pending.putIfAbsent(key, () async {
       try {
-        final response = await _client.get(uri).timeout(timeout);
+        final response =
+            await _client.get(uri).timeout(requestTimeout ?? timeout);
         if (response.statusCode == 422) {
           throw const ApiException(
               'هذا التحدي غير متاح حاليا. حاول مجددا بعد قليل.');
@@ -51,6 +53,15 @@ class ApiService {
         _pending.remove(key);
       }
     });
+  }
+
+  /// The first connection can take longer while the hosted backend wakes up.
+  Future<void> warmUp() async {
+    final data = await _get('/api/health', {},
+        requestTimeout: const Duration(seconds: 90));
+    if (data['ok'] != true) {
+      throw const ApiException('الخادم غير متاح حاليا. حاول مرة أخرى.');
+    }
   }
 
   Future<Puzzle> fetchPuzzle(int level, {int? size}) async {

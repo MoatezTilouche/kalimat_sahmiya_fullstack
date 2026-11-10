@@ -162,6 +162,12 @@ temporary project and copies **only** native folders, preserving Dart, assets,
 tests and pubspec. It adds Internet permission, Arabic app names, and debug-only
 local HTTP configuration. It does not touch the phone database.
 
+Without an `API_BASE_URL` override, the app connects to
+`https://kalimat-sahmiya-api.onrender.com`. Its branded splash checks `/api/health`
+and allows up to 90 seconds for the server to wake up. A ready server advances
+after a minimum of three seconds; retry and offline continuation are available.
+Use the local URL overrides shown here when running your own backend.
+
 Android emulator uses `10.0.2.2`; iOS simulator uses `127.0.0.1`. A physical device
 needs your computer's LAN address on the same network. Android debug manifest and
 iOS `Info-Debug.plist` permit local HTTP; release configurations require HTTPS.

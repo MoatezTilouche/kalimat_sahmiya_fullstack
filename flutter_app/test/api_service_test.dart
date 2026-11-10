@@ -9,6 +9,45 @@ import 'package:kalimat_sahmiya/services/api_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets('health check allows a cold start longer than normal API calls',
+      (tester) async {
+    final response = Completer<http.Response>();
+    Uri? requestedUrl;
+    final api = ApiService(
+        timeout: const Duration(seconds: 1),
+        client: MockClient((request) {
+          requestedUrl = request.url;
+          return response.future;
+        }));
+    final ready = api.warmUp();
+    final completion = expectLater(ready, completes);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 65));
+    response.complete(http.Response('{"ok":true}', 200));
+    await tester.pump();
+    await completion;
+    expect(requestedUrl?.path, '/api/health');
+    expect(requestedUrl?.host, 'kalimat-sahmiya-api.onrender.com');
+    api.close();
+  });
+  testWidgets('health check times out after 90 seconds and can be retried',
+      (tester) async {
+    var requests = 0;
+    final response = Completer<http.Response>();
+    final api = ApiService(client: MockClient((_) {
+      requests++;
+      return requests == 1
+          ? response.future
+          : Future.value(http.Response('{"ok":true}', 200));
+    }));
+    final failure = expectLater(api.warmUp(), throwsA(isA<ApiException>()));
+    await tester.pump(const Duration(seconds: 91));
+    await failure;
+    await api.warmUp();
+    expect(requests, 2);
+    response.complete(http.Response('{"ok":true}', 200));
+    api.close();
+  });
   test('coalesces requests and lets the backend choose grid complexity',
       () async {
     final levels = jsonDecode(

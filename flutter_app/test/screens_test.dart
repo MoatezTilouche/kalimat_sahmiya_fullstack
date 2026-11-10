@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:kalimat_sahmiya/main.dart';
 import 'package:kalimat_sahmiya/models/puzzle.dart';
 import 'package:kalimat_sahmiya/screens/game_screen.dart';
@@ -16,7 +18,11 @@ import 'package:kalimat_sahmiya/widgets/arabic_keyboard.dart';
 
 // Storage itself is covered against real SQLite in game_store_test.dart.
 class MemoryStore extends GameStore {
-  MemoryStore(this.puzzle);
+  MemoryStore(this.puzzle)
+      : super(
+            api: ApiService(
+                client: MockClient(
+                    (_) async => http.Response('{"ok":true}', 200))));
   final Puzzle puzzle;
   bool seen = false, offline = false;
   int requests = 0;
@@ -121,6 +127,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     final store = MemoryStore(puzzle);
     await tester.pumpWidget(ArabicArrowwordsApp(store: store));
+    await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
     expect(find.text('إلى أبي الغالي جوهر، بكل الحب والتقدير'), findsOneWidget);
     for (var i = 0; i < 3; i++) {
@@ -134,6 +141,7 @@ void main() {
     expect(find.byType(HomeScreen), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
     await tester.pumpWidget(ArabicArrowwordsApp(store: store));
+    await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
     expect(find.byType(IntroScreen), findsNothing);
     expect(find.byType(HomeScreen), findsOneWidget);

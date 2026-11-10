@@ -15,3 +15,6 @@ backend/data/
 backend/backups/
 *.db-shm
 *.db-wal
+.tools/
+.venv/
+**/.venv/

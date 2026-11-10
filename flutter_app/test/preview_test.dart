@@ -11,6 +11,7 @@ import 'package:kalimat_sahmiya/models/puzzle.dart';
 import 'package:kalimat_sahmiya/screens/game_screen.dart';
 import 'package:kalimat_sahmiya/screens/home_screen.dart';
 import 'package:kalimat_sahmiya/screens/intro_screen.dart';
+import 'package:kalimat_sahmiya/screens/splash_screen.dart';
 import 'package:kalimat_sahmiya/theme.dart';
 import 'package:kalimat_sahmiya/widgets/game_components.dart';
 import 'package:kalimat_sahmiya/services/preview_store.dart';
@@ -26,7 +27,10 @@ void main() {
   late Puzzle puzzle;
   late PreviewStore store;
   setUpAll(() async {
-    if (!const bool.fromEnvironment('GENERATE_PREVIEWS')) return;
+    if (!const bool.fromEnvironment('GENERATE_PREVIEWS') &&
+        !const bool.fromEnvironment('GENERATE_SPLASH_PREVIEW')) {
+      return;
+    }
     final font = FontLoader('NotoArabic')
       ..addFont(rootBundle.load('assets/fonts/NotoSansArabic.ttf'));
     await font.load();
@@ -52,7 +56,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     final key = GlobalKey();
     Future<void> capture(String name, Widget child,
-        {Future<void> Function()? prepare}) async {
+        {Future<void> Function()? prepare, bool settle = true}) async {
       debugPrint('Rendering $name');
       await tester.pumpWidget(RepaintBoundary(
           key: key,
@@ -61,10 +65,18 @@ void main() {
               theme: gameTheme(),
               home: Directionality(
                   textDirection: TextDirection.rtl, child: child))));
-      await tester.pumpAndSettle();
+      if (settle) {
+        await tester.pumpAndSettle();
+      } else {
+        await tester.pump(const Duration(milliseconds: 400));
+      }
       if (prepare != null) {
         await prepare();
-        await tester.pumpAndSettle();
+        if (settle) {
+          await tester.pumpAndSettle();
+        } else {
+          await tester.pump(const Duration(milliseconds: 400));
+        }
       }
       expect(tester.takeException(), isNull);
       final boundary =
@@ -80,6 +92,17 @@ void main() {
       });
     }
 
+    if (const bool.fromEnvironment('GENERATE_SPLASH_PREVIEW')) {
+      await capture('splash', SplashScreen(warmUp: () async {}, onReady: () {}),
+          settle: false, prepare: () async {
+        await tester.runAsync(() => precacheImage(
+            const AssetImage('assets/branding/logo.png'),
+            tester.element(find.byType(SplashScreen))));
+      });
+      await tester.pumpWidget(const SizedBox.shrink());
+      await store.close();
+      return;
+    }
     await capture('home', HomeScreen(store: store));
     await capture('levels', HomeScreen(store: store), prepare: () async {
       await tester.tap(find.text('المستويات'));
@@ -111,5 +134,6 @@ void main() {
     await store.close();
   },
       timeout: const Timeout(Duration(seconds: 60)),
-      skip: !const bool.fromEnvironment('GENERATE_PREVIEWS'));
+      skip: !const bool.fromEnvironment('GENERATE_PREVIEWS') &&
+          !const bool.fromEnvironment('GENERATE_SPLASH_PREVIEW'));
 }

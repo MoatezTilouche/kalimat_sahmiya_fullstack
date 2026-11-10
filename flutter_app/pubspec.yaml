@@ -26,6 +26,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/branding/logo.png
     - assets/puzzles/starter_levels.json
     - assets/knowledge/cards.json
     - assets/fonts/OFL.txt

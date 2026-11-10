@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'dart:async';
 import 'screens/home_screen.dart';
 import 'screens/intro_screen.dart';
+import 'screens/splash_screen.dart';
 import 'services/game_store.dart';
 import 'services/preview_store.dart';
 import 'services/speech_service.dart';
@@ -55,6 +56,7 @@ class ArabicArrowwordsApp extends StatefulWidget {
 class _ArabicArrowwordsAppState extends State<ArabicArrowwordsApp>
     with WidgetsBindingObserver {
   bool? introSeen;
+  bool _splashFinished = false;
   late final _store = widget.store ?? GameStore.instance;
 
   @override
@@ -110,11 +112,28 @@ class _ArabicArrowwordsAppState extends State<ArabicArrowwordsApp>
                     child: child ?? const SizedBox.shrink()));
           },
         ),
-        home: introSeen == null
-            ? const Scaffold(body: Center(child: CircularProgressIndicator()))
-            : introSeen!
-                ? HomeScreen(store: _store)
-                : IntroScreen(onStart: finishIntro),
+        home: Builder(
+          builder: (context) => AnimatedSwitcher(
+            duration: motionDuration(context, 400),
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween(begin: const Offset(0, .04), end: Offset.zero)
+                    .animate(animation),
+                child: child,
+              ),
+            ),
+            child: !_splashFinished || introSeen == null
+                ? SplashScreen(
+                    warmUp: _store.api.warmUp,
+                    onReady: () {
+                      if (mounted) setState(() => _splashFinished = true);
+                    })
+                : introSeen!
+                    ? HomeScreen(store: _store)
+                    : IntroScreen(onStart: finishIntro),
+          ),
+        ),
       );
 }
 

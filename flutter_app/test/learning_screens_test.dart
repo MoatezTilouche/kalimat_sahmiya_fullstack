@@ -23,7 +23,10 @@ void main() {
   setUp(() async {
     store = PreviewStore(
         api: ApiService(
-            client: MockClient((_) async => http.Response('{}', 404))));
+            client: MockClient((request) async =>
+                request.url.path == '/api/health'
+                    ? http.Response('{"ok":true}', 200)
+                    : http.Response('{}', 404))));
     await store.init();
     await store.markIntroSeen();
   });
@@ -175,6 +178,7 @@ void main() {
     await store.learning.setPreference('font_scale', '1.4');
     await store.learning.setPreference('focus_mode', 'true');
     await tester.pumpWidget(ArabicArrowwordsApp(store: store));
+    await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     await tester
@@ -238,6 +242,7 @@ void main() {
     tester.view.physicalSize = const Size(430, 1100);
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(ArabicArrowwordsApp(store: store));
+    await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('إعدادات الراحة'));
     await tester.pumpAndSettle();
