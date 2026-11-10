@@ -1,0 +1,43 @@
+{
+  "difficultyCounts": {
+    "easy": {
+      "pairs": 6951,
+      "answers": 1345
+    },
+    "medium": {
+      "pairs": 22407,
+      "answers": 7304
+    },
+    "hard": {
+      "pairs": 47015,
+      "answers": 25083
+    }
+  },
+  "eligiblePairs": 76373,
+  "distinctAnswers": 33173,
+  "sources": [
+    {
+      "origin": "Arabic WordNet 4.0",
+      "pairs": 75868
+    },
+    {
+      "origin": "curated",
+      "pairs": 208
+    },
+    {
+      "origin": "starter",
+      "pairs": 297
+    }
+  ],
+  "measuredFrequencyPairs": 73626,
+  "heuristicPairs": 2747,
+  "imports": [
+    {
+      "sha256": "bd24bee99026ecc773cf51f3dc58979d8424092a49dc80f90b938fb44d32a085",
+      "source": "awn4.xml.gz",
+      "imported_at": "2026-11-10T08:54:10.303755+00:00",
+      "report_json": "{\"scanned\": 184238, \"inserted\": 0, \"duplicates\": 75980, \"rejected\": 108258, \"measured\": 73738}"
+    }
+  ],
+  "invalidEligibleIds": []
+}

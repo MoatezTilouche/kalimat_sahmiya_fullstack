@@ -1,0 +1,2 @@
+# Stream XML directly; no separate wn database or model is required.
+-r requirements.txt

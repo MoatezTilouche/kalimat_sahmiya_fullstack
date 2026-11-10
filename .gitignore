@@ -1,0 +1,17 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+.venv/
+.dart_tool/
+.flutter-plugins*
+.packages
+build/
+*.log
+*.iml
+.idea/
+.vscode/
+.tools/
+backend/data/
+backend/backups/
+*.db-shm
+*.db-wal

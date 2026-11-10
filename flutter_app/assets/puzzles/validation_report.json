@@ -1,0 +1,26 @@
+{
+  "levels": 75,
+  "sha256": "d960f03d3d1f75920f5be94336e852964265450a0a7df7358636e13abc6cffe0",
+  "counts": {
+    "easy": {
+      "pairs": 6951,
+      "answers": 1345
+    },
+    "medium": {
+      "pairs": 22407,
+      "answers": 7304
+    },
+    "hard": {
+      "pairs": 47015,
+      "answers": 25083
+    }
+  },
+  "uniqueAnswersUsed": 399,
+  "maxAnswerUses": 8,
+  "levelsByDifficulty": {
+    "easy": 20,
+    "medium": 30,
+    "hard": 25
+  },
+  "minimumWordsPerLevel": 9
+}
